@@ -1,0 +1,15 @@
+package com.example.ProyectoFinal.Dao;
+
+import com.example.ProyectoFinal.Entity.Turista;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface TuristaRepository extends JpaRepository<Turista, Integer> {
+
+
+    boolean existsByUsuario_IdUsuario(Integer idUsuario);
+    Optional<Turista> findByUsuario_IdUsuario(Integer idUsuario);
+}

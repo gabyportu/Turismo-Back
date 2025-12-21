@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ProyectoTurismo
+    username: postgres
+    password: 13643389
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: proyectoturismoportugal@gmail.com
+    password: suhj tiof xvlz lmii
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: smtp.gmail.com
+security:
+  jwt:
+    secret: "mi_clave_de_mi_proyecto_final_abcde_gaby_portugal_112112_abeja"
+    expirationMinutes: 190
+minio:
+  url: http://localhost:9000
+  accessKey: minioadmin
+  secretKey: minioadmin123
+  bucket: archivos
+server:
+  port: 8112
