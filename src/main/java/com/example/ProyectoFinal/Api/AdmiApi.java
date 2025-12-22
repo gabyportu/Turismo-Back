@@ -2,8 +2,10 @@ package com.example.ProyectoFinal.Api;
 
 import com.example.ProyectoFinal.Bl.EmpresaBl;
 import com.example.ProyectoFinal.Bl.OfertaBl;
+import com.example.ProyectoFinal.Bl.PalabraProhibidaBl;
 import com.example.ProyectoFinal.Bl.UsuarioBl;
 import com.example.ProyectoFinal.Dto.UsuarioDto;
+import com.example.ProyectoFinal.Entity.PalabraProhibida;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,8 @@ public class AdmiApi {
     private UsuarioBl usuarioBl;
     @Autowired
     private OfertaBl ofertaBl;
+    @Autowired
+    private PalabraProhibidaBl palabraProhibidaBl;
 
     @PostMapping("/registrar")
     public ResponseEntity<?> registrarAdmin(@RequestBody UsuarioDto usuarioDto) {
@@ -54,6 +58,7 @@ public class AdmiApi {
                 "estado", "APROBADO"
         ));
     }
+
     @PutMapping("oferta/rechazar/{idOferta}")
     public ResponseEntity<?> rechazarOferta (@PathVariable Integer idOferta) {
         ofertaBl.rechazarOferta(idOferta);
@@ -62,5 +67,16 @@ public class AdmiApi {
                 "idOferta", idOferta,
                 "estado", "RECHAZADO"
         ));
+    }
+
+    @PostMapping("/crear/palabra")
+    public ResponseEntity<?> crearPalabra(@RequestBody Map<String, String> body) {
+        palabraProhibidaBl.agregarPalabra(body.get("palabra"));
+        return ResponseEntity.ok(Map.of("message", "Palabra agregada"));
+    }
+
+    @GetMapping("/listar")
+    public ResponseEntity<?> listar() {
+        return ResponseEntity.ok(palabraProhibidaBl.listar());
     }
 }

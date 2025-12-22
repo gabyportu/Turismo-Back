@@ -1,5 +1,7 @@
 package com.example.ProyectoFinal.Dto;
 
+import java.util.Date;
+
 public class CrearResenaRequestDto {
 
     private Integer idOferta;

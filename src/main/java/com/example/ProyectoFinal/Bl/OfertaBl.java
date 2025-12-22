@@ -4,6 +4,7 @@ import com.example.ProyectoFinal.Dao.*;
 import com.example.ProyectoFinal.Dto.MultimediaItemDto;
 import com.example.ProyectoFinal.Dto.OfertaDetalleDto;
 import com.example.ProyectoFinal.Dto.OfertaDto;
+import com.example.ProyectoFinal.Dto.OfertaRankingDto;
 import com.example.ProyectoFinal.Entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -323,5 +324,9 @@ public class OfertaBl {
         dto.setFechaCreacion(oferta.getFechaCreacion());
         dto.setStatus(oferta.getStatus());
         return dto;
+    }
+    @Transactional(readOnly = true)
+    public List<OfertaRankingDto> obtenerOfertasMejorPuntuadas(){
+        return ofertaRepository.listarOfertasMejorPuntuadas();
     }
 }

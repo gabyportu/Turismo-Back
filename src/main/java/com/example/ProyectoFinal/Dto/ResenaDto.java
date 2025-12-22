@@ -4,8 +4,8 @@ import java.util.Date;
 
 public class ResenaDto {
     private Integer idResena;
-    private Integer idOferta;
     private Integer idTurista;
+    private Integer idOferta;
     private Integer calificacion;
     private String comentario;
     private Date fecha;
@@ -13,13 +13,13 @@ public class ResenaDto {
 
     public ResenaDto() {}
 
-    public ResenaDto(Integer idResena, Integer idOferta, Integer idTurista, Integer calificacion, Date fecha, String comentario, Boolean status) {
+    public ResenaDto(Integer idResena, Integer idTurista, Integer idOferta, Integer calificacion, String comentario, Date fecha, Boolean status) {
         this.idResena = idResena;
-        this.idOferta = idOferta;
         this.idTurista = idTurista;
+        this.idOferta = idOferta;
         this.calificacion = calificacion;
-        this.fecha = fecha;
         this.comentario = comentario;
+        this.fecha = fecha;
         this.status = status;
     }
 
@@ -35,16 +35,16 @@ public class ResenaDto {
         return idOferta;
     }
 
-    public void setIdOferta(Integer idOferta) {
-        this.idOferta = idOferta;
-    }
-
     public Integer getIdTurista() {
         return idTurista;
     }
 
     public void setIdTurista(Integer idTurista) {
         this.idTurista = idTurista;
+    }
+
+    public void setIdOferta(Integer idOferta) {
+        this.idOferta = idOferta;
     }
 
     public Integer getCalificacion() {
@@ -84,7 +84,6 @@ public class ResenaDto {
         return "ResenaDto{" +
                 "idResena=" + idResena +
                 ", idOferta=" + idOferta +
-                ", idTurista=" + idTurista +
                 ", calificacion=" + calificacion +
                 ", comentario='" + comentario + '\'' +
                 ", fecha=" + fecha +

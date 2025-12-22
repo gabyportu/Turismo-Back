@@ -1,10 +1,7 @@
 package com.example.ProyectoFinal.Api;
 
 import com.example.ProyectoFinal.Bl.OfertaBl;
-import com.example.ProyectoFinal.Dto.CrearOfertaRequestDto;
-import com.example.ProyectoFinal.Dto.EditarOfertaRequestDto;
-import com.example.ProyectoFinal.Dto.OfertaDetalleDto;
-import com.example.ProyectoFinal.Dto.OfertaDto;
+import com.example.ProyectoFinal.Dto.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -66,5 +63,11 @@ public class OfertaApi {
     @GetMapping("/pendientes")
     public ResponseEntity<List<OfertaDto>> listarPendientes() {
         return ResponseEntity.ok(ofertaBl.listarOfertasPendientes());
+    }
+    @GetMapping("mejor-puntuadas")
+    public ResponseEntity<List<OfertaRankingDto>> mejorPuntuadas(){
+        return ResponseEntity.ok(
+                ofertaBl.obtenerOfertasMejorPuntuadas()
+        );
     }
 }
