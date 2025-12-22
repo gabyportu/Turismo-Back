@@ -5,12 +5,14 @@ import com.example.ProyectoFinal.Dto.EmpresaDetalleDto;
 import com.example.ProyectoFinal.Dto.EmpresaDto;
 import com.example.ProyectoFinal.Dto.RegistroEmpresaRequestDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/empresa")
@@ -50,5 +52,4 @@ public class EmpresaApi {
     public ResponseEntity<List<EmpresaDto>> listarPendientes() {
         return ResponseEntity.ok(empresaBl.listarEmpresasPendientes());
     }
-
 }

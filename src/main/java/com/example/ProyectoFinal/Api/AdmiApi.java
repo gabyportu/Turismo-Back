@@ -6,6 +6,7 @@ import com.example.ProyectoFinal.Bl.PalabraProhibidaBl;
 import com.example.ProyectoFinal.Bl.UsuarioBl;
 import com.example.ProyectoFinal.Dto.UsuarioDto;
 import com.example.ProyectoFinal.Entity.PalabraProhibida;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,35 +39,82 @@ public class AdmiApi {
     }
 
     @PutMapping("empresa/aprobar/{idEmpresa}")
-    public ResponseEntity<?> aprobarEmpresa(@PathVariable Integer idEmpresa) {
-        empresaBl.aprobarEmpresa(idEmpresa);
-        return ResponseEntity.ok().body("Empresa aprobada");
+    public ResponseEntity<?> aprobarEmpresa(@PathVariable Integer idEmpresa, HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if(!"ROLE_ADMIN".equals(role)) {
+            return ResponseEntity.status(403).body(Map.of("error", "Acceso denegado. Solo administradores"));
+        }
+        try{
+            empresaBl.aprobarEmpresa(idEmpresa);
+            return ResponseEntity.ok(Map.of("mensaje", "Empresa aprobarada"));
+        }catch (RuntimeException e){
+            return ResponseEntity.status(403).body(Map.of("error", e.getMessage()));
+        }
     }
-
     @PutMapping("empresa/rechazar/{idEmpresa}")
-    public ResponseEntity<?> rechazarEmpresa(@PathVariable Integer idEmpresa) {
-        empresaBl.rechazarEmpresa(idEmpresa);
-        return ResponseEntity.ok().body("Empresa rechazada");
+    public ResponseEntity<?> rechazarEmpresa(
+            @PathVariable Integer idEmpresa,
+            HttpServletRequest request
+    ) {
+        String role = (String) request.getAttribute("role");
+
+        if (!"ROLE_ADMIN".equals(role)) {
+            return ResponseEntity.status(403).body(Map.of("error", "Acceso denegado. Solo administradores."));
+        }
+
+        try {
+            empresaBl.rechazarEmpresa(idEmpresa);
+            return ResponseEntity.ok(Map.of("mensaje", "Empresa rechazada correctamente"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
-    @PutMapping("oferta/aprobar/{idOferta}")
-    public ResponseEntity<?> aprobarOferta(@PathVariable Integer idOferta) {
-        ofertaBl.aprobarOferta(idOferta);
-        return ResponseEntity.ok(Map.of(
-                "message", "Oferta aprobada",
-                "idOferta", idOferta,
-                "estado", "APROBADO"
-        ));
-    }
+    @PutMapping("/oferta/aprobar/{idOferta}")
+    public ResponseEntity<?> aprobarOferta(
+            @PathVariable Integer idOferta,
+            HttpServletRequest request
+    ) {
+        String role = (String) request.getAttribute("role");
 
-    @PutMapping("oferta/rechazar/{idOferta}")
-    public ResponseEntity<?> rechazarOferta (@PathVariable Integer idOferta) {
-        ofertaBl.rechazarOferta(idOferta);
-        return ResponseEntity.ok(Map.of(
-                "message", "Oferta rechazada",
-                "idOferta", idOferta,
-                "estado", "RECHAZADO"
-        ));
+        if (!"ROLE_ADMIN".equals(role)) {
+            return ResponseEntity.status(403)
+                    .body(Map.of("error", "Acceso denegado. Solo administradores."));
+        }
+
+        try {
+            ofertaBl.aprobarOferta(idOferta);
+            return ResponseEntity.ok(Map.of(
+                    "mensaje", "Oferta aprobada correctamente",
+                    "idOferta", idOferta
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+    @PutMapping("/oferta/rechazar/{idOferta}")
+    public ResponseEntity<?> rechazarOferta(
+            @PathVariable Integer idOferta,
+            HttpServletRequest request
+    ) {
+        String role = (String) request.getAttribute("role");
+
+        if (!"ROLE_ADMIN".equals(role)) {
+            return ResponseEntity.status(403)
+                    .body(Map.of("error", "Acceso denegado. Solo administradores."));
+        }
+
+        try {
+            ofertaBl.rechazarOferta(idOferta);
+            return ResponseEntity.ok(Map.of(
+                    "mensaje", "Oferta rechazada correctamente",
+                    "idOferta", idOferta
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/crear/palabra")
