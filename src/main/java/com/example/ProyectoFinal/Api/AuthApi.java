@@ -24,8 +24,7 @@ public class AuthApi {
             return ResponseEntity.ok(res);
         }catch (Exception e){
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Credenciales inválidas", "detail", e.getMessage()));
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }
