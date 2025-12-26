@@ -30,4 +30,17 @@ public interface OfertaRepository extends JpaRepository<Oferta, Integer>{
 """)
     List<OfertaRankingDto> listarOfertasMejorPuntuadas();
 
+    // 🔹 Caso 1: Pendiente + Aprobado
+    List<Oferta> findByEmpresa_IdEmpresaAndStatusTrueAndEstadoIn(
+            Integer idEmpresa,
+            List<String> estados
+    );
+
+    // 🔹 Caso 2: Solo aprobado
+    List<Oferta> findByEmpresa_IdEmpresaAndStatusTrueAndEstado(
+            Integer idEmpresa,
+            String estado
+    );
+
+
 }

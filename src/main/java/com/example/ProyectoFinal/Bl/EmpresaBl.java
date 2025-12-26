@@ -68,7 +68,7 @@ public class EmpresaBl {
             empresa.setFacebook(empresaDto.getFacebook());
             empresa.setInstagram(empresaDto.getInstagram());
             empresa.setEstado("PENDIENTE");
-            empresa.setStatus(false);
+            empresa.setStatus(true);
             empresa.setLogoUrl(null);
             empresa = empresaRepository.save(empresa);
 
@@ -177,6 +177,18 @@ public class EmpresaBl {
         repDto.setExtension(representante.getExtension());
         repDto.setStatus(representante.getStatus());
 
+        Usuario usuario = representante.getUsuario();
+
+        UsuarioDto usuarioDto = new UsuarioDto();
+        usuarioDto.setIdUsuario(representante.getUsuario().getIdUsuario());
+        usuarioDto.setNombres(usuario.getNombres());
+        usuarioDto.setApellidoPaterno(usuario.getApellidoPaterno());
+        usuarioDto.setApellidoMaterno(usuario.getApellidoMaterno());
+        usuarioDto.setFechaNacimiento(usuario.getFechaNacimiento());
+        usuarioDto.setGenero(usuario.getGenero());
+        usuarioDto.setTelefono(usuario.getTelefono());
+        usuario.setCorreo(usuario.getCorreo());
+
         // Documentos desde DB -> URL MinIO
         List<DocumentoEmpresaViewDto> docs = documentoEmpresaRepository
                 .findByEmpresa_IdEmpresa(idEmpresa)
@@ -205,6 +217,7 @@ public class EmpresaBl {
         EmpresaDetalleDto res = new EmpresaDetalleDto();
         res.setEmpresa(empresaDto);
         res.setRepresentante(repDto);
+        res.setUsuario(usuarioDto);
         res.setLogoObjectName(logoObjectName);
         res.setLogoUrl(logoUrl);
         res.setDocumentos(docs);

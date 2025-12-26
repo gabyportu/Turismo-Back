@@ -57,7 +57,7 @@ public class EmpresaApi {
 
             String token = authHeader.substring(7).trim();
 
-            jwtBl.validateTokenAndRoles(token, "ROLE_TURISTA", "ROL_EMPRESA");
+            jwtBl.validateTokenAndRoles(token, "ROLE_TURISTA", "ROLE_EMPRESA", "ROLE_ADMIN");
 
             return ResponseEntity.ok(empresaBl.obtenerDetalleEmpresa(idEmpresa));
         }catch (Exception e) {

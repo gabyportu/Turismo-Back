@@ -1,10 +1,7 @@
 package com.example.ProyectoFinal.Bl;
 
 import com.example.ProyectoFinal.Dao.*;
-import com.example.ProyectoFinal.Dto.MultimediaItemDto;
-import com.example.ProyectoFinal.Dto.OfertaDetalleDto;
-import com.example.ProyectoFinal.Dto.OfertaDto;
-import com.example.ProyectoFinal.Dto.OfertaRankingDto;
+import com.example.ProyectoFinal.Dto.*;
 import com.example.ProyectoFinal.Entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -121,6 +118,7 @@ public class OfertaBl {
                                   List<Integer> destinos,
                                   List<Integer> actividades,
                                   List<MultipartFile> nuevaMultimedia) {
+
         try {
             if (ofertaDto.getIdOferta() == null) {
                 throw new RuntimeException("idOferta es requerido para editar");
@@ -144,6 +142,8 @@ public class OfertaBl {
             if (ofertaDto.getFechaFin() != null) {
                 oferta.setFechaFin(new java.sql.Date(ofertaDto.getFechaFin().getTime()));
             }
+
+            oferta.setEstado("PENDIENTE");
 
             oferta = ofertaRepository.save(oferta);
 
@@ -173,6 +173,7 @@ public class OfertaBl {
                 }
             }
 
+            // ✅ Agregar nueva multimedia (no borra lo anterior)
             if (nuevaMultimedia != null && !nuevaMultimedia.isEmpty()) {
                 String prefix = "ofertas/" + oferta.getIdOferta() + "/multimedia";
 
@@ -201,6 +202,7 @@ public class OfertaBl {
             res.setEstado(oferta.getEstado());
             res.setFechaCreacion(oferta.getFechaCreacion());
             res.setStatus(oferta.getStatus());
+
             return res;
 
         } catch (Exception e) {
@@ -234,10 +236,6 @@ public class OfertaBl {
         Oferta oferta = ofertaRepository.findById(idOferta)
                 .orElseThrow(() -> new RuntimeException("Oferta no encontrada con ID: " + idOferta));
 
-        /*if (Boolean.FALSE.equals(oferta.getStatus())) {
-            throw new RuntimeException("La oferta está eliminada/inactiva");
-        }*/
-
         // Oferta -> OfertaDto
         OfertaDto ofertaDto = new OfertaDto();
         ofertaDto.setIdOferta(oferta.getIdOferta());
@@ -251,18 +249,6 @@ public class OfertaBl {
         ofertaDto.setEstado(oferta.getEstado());
         ofertaDto.setFechaCreacion(oferta.getFechaCreacion());
         ofertaDto.setStatus(oferta.getStatus());
-
-        // Destinos (ids)
-        List<Integer> destinos = ofertaDestinoRepository.findByOferta_IdOferta(idOferta)
-                .stream()
-                .map(od -> od.getDestino().getIdDestino())
-                .toList();
-
-        // Actividades (ids)
-        List<Integer> actividades = ofertaActividadRepository.findByOferta_IdOferta(idOferta)
-                .stream()
-                .map(oa -> oa.getTipoActividad().getIdTipoActividad())
-                .toList();
 
         // Multimedia -> generar URL firmada
         int minutes = 60*24; // ejemplo: 30 min
@@ -283,13 +269,29 @@ public class OfertaBl {
                 })
                 .toList();
 
-        OfertaDetalleDto res = new OfertaDetalleDto();
-        res.setOferta(ofertaDto);
-        res.setDestinos(destinos);
-        res.setActividades(actividades);
-        res.setMultimedia(multimedia);
+        OfertaDetalleDto detalleDto = new OfertaDetalleDto();
+        detalleDto.setOferta(ofertaDto);
+        detalleDto.setDestinos(
+                ofertaDestinoRepository.findByOferta_IdOferta(idOferta)
+                        .stream()
+                        .map(od -> new ItemDto(
+                                od.getDestino().getIdDestino(),
+                                od.getDestino().getNombre()
+                        ))
+                        .toList()
+        );
 
-        return res;
+        detalleDto.setActividades(
+                ofertaActividadRepository.findByOferta_IdOferta(idOferta)
+                        .stream()
+                        .map(oa -> new ItemDto(
+                                oa.getTipoActividad().getIdTipoActividad(),
+                                oa.getTipoActividad().getNombre()
+                        )).toList()
+        );
+        detalleDto.setMultimedia(multimedia);
+
+        return detalleDto;
     }
     @Transactional(readOnly = true)
     public List<OfertaDto> listarOfertasAprobadas() {
@@ -329,4 +331,92 @@ public class OfertaBl {
     public List<OfertaRankingDto> obtenerOfertasMejorPuntuadas(){
         return ofertaRepository.listarOfertasMejorPuntuadas();
     }
+
+    @Transactional(readOnly = true)
+    public List<OfertaListadoDto> listarOfertasEmpresaConImagen(
+            Integer idEmpresa
+    ) {
+
+        List<Oferta> ofertas = ofertaRepository
+                .findByEmpresa_IdEmpresaAndStatusTrueAndEstadoIn(
+                        idEmpresa,
+                        List.of("PENDIENTE", "APROBADO")
+                );
+
+        return ofertas.stream().map(oferta -> {
+
+            OfertaListadoDto dto = new OfertaListadoDto();
+            dto.setIdOferta(oferta.getIdOferta());
+            dto.setTitulo(oferta.getTitulo());
+            dto.setDescripcion(oferta.getDescripcion());
+            dto.setPrecio(oferta.getPrecio());
+            dto.setEstado(oferta.getEstado());
+
+            // 👇 buscar UNA imagen
+            multimediaOfertaRepository
+                    .findFirstByOferta_IdOfertaAndStatusTrueOrderByIdMultimediaOfertaAsc(
+                            oferta.getIdOferta()
+                    )
+                    .ifPresent(m -> {
+                        MultimediaItemDto img = new MultimediaItemDto();
+                        img.setIdMultimediaOferta(m.getIdMultimediaOferta());
+                        img.setObjectName(m.getMultimedia());
+                        img.setStatus(m.getStatus());
+
+                        // URL firmada MinIO
+                        img.setUrl(
+                                minioBl.presignedGetUrl(m.getMultimedia(), 60)
+                        );
+
+                        dto.setImagenPrincipal(img);
+                    });
+
+            return dto;
+        }).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<OfertaListadoDto> listarOfertasEmpresaAprobadas(
+            Integer idEmpresa
+    ) {
+
+        List<Oferta> ofertas = ofertaRepository
+                .findByEmpresa_IdEmpresaAndStatusTrueAndEstadoIn(
+                        idEmpresa,
+                        List.of("APROBADO")
+                );
+
+        return ofertas.stream().map(oferta -> {
+
+            OfertaListadoDto dto = new OfertaListadoDto();
+            dto.setIdOferta(oferta.getIdOferta());
+            dto.setTitulo(oferta.getTitulo());
+            dto.setDescripcion(oferta.getDescripcion());
+            dto.setPrecio(oferta.getPrecio());
+            dto.setEstado(oferta.getEstado());
+
+            // 👇 buscar UNA imagen
+            multimediaOfertaRepository
+                    .findFirstByOferta_IdOfertaAndStatusTrueOrderByIdMultimediaOfertaAsc(
+                            oferta.getIdOferta()
+                    )
+                    .ifPresent(m -> {
+                        MultimediaItemDto img = new MultimediaItemDto();
+                        img.setIdMultimediaOferta(m.getIdMultimediaOferta());
+                        img.setObjectName(m.getMultimedia());
+                        img.setStatus(m.getStatus());
+
+                        // URL firmada MinIO
+                        img.setUrl(
+                                minioBl.presignedGetUrl(m.getMultimedia(), 60)
+                        );
+
+                        dto.setImagenPrincipal(img);
+                    });
+
+            return dto;
+        }).toList();
+    }
+
+
 }

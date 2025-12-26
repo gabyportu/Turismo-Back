@@ -28,6 +28,11 @@ spring:
             required: true
           ssl:
             trust: smtp.gmail.com
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 200MB
+      max-request-size: 300MB
 security:
   jwt:
     secret: "mi_clave_de_mi_proyecto_final_abcde_gaby_portugal_112112_abeja"
