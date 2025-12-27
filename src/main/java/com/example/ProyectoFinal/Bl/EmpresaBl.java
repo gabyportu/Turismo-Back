@@ -245,5 +245,75 @@ public class EmpresaBl {
             return dto;
         }).toList();
     }
+    @Transactional
+    public EmpresaDto editarEmpresa(EditarEmpresaRequestDto req, MultipartFile nuevoLogo){
+        EmpresaDto empresaDto = req.getEmpresa();
+        UsuarioDto usuarioDto = req.getUsuario();
+        RepresentanteDto repDto = req.getRepresentante();
 
+        Empresa empresa = empresaRepository.findById(empresaDto.getIdEmpresa())
+                .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
+
+        Ciudad ciudad = ciudadRepository.findById(empresaDto.getIdCiudad())
+                .orElseThrow(() -> new RuntimeException("Ciudad no encontrada"));
+
+        empresa.setCiudad(ciudad);
+        empresa.setNombre(empresaDto.getNombre());
+        empresa.setDescripcion(empresaDto.getDescripcion());
+        empresa.setFacebook(empresaDto.getFacebook());
+        empresa.setInstagram(empresaDto.getInstagram());
+
+        if (nuevoLogo != null && !nuevoLogo.isEmpty()) {
+
+            // eliminar logo anterior si existe
+            if (empresa.getLogoUrl() != null) {
+                minioBl.delete(empresa.getLogoUrl());
+            }
+
+            String folder = "empresas/" + empresa.getIdEmpresa() + "/logo";
+            String objectName = minioBl.upload(nuevoLogo, folder);
+            empresa.setLogoUrl(objectName);
+        }
+
+        empresaRepository.save(empresa);
+
+        // 3️⃣ Representante
+        Representante representante = representanteRepository
+                .findByEmpresa_IdEmpresa(empresa.getIdEmpresa())
+                .orElseThrow(() -> new RuntimeException("Representante no encontrado"));
+
+        representante.setNumeroDocumento(repDto.getNumeroDocumento());
+        representante.setExtension(repDto.getExtension());
+        representanteRepository.save(representante);
+
+        // 4️⃣ Usuario
+        Usuario usuario = representante.getUsuario();
+
+        if (usuarioDto.getNombres() != null) usuario.setNombres(usuarioDto.getNombres());
+        if (usuarioDto.getApellidoPaterno() != null) usuario.setApellidoPaterno(usuarioDto.getApellidoPaterno());
+        if (usuarioDto.getApellidoMaterno() != null) usuario.setApellidoMaterno(usuarioDto.getApellidoMaterno());
+        if (usuarioDto.getTelefono() != null) usuario.setTelefono(usuarioDto.getTelefono());
+        if (usuarioDto.getGenero() != null) usuario.setGenero(usuarioDto.getGenero());
+
+// ⚠️ IMPORTANTE: fechaNacimiento es NOT NULL en BD, entonces solo actualiza si viene
+        if (usuarioDto.getFechaNacimiento() != null) {
+            usuario.setFechaNacimiento(usuarioDto.getFechaNacimiento());
+        }
+
+        usuarioRepository.save(usuario);
+
+        EmpresaDto res = new EmpresaDto();
+        res.setIdEmpresa(empresa.getIdEmpresa());
+        res.setIdCiudad(ciudad.getIdCiudad());
+        res.setNombre(empresa.getNombre());
+        res.setNit(empresa.getNit());
+        res.setDescripcion(empresa.getDescripcion());
+        res.setFacebook(empresa.getFacebook());
+        res.setInstagram(empresa.getInstagram());
+        res.setLogoURL(empresa.getLogoUrl());
+        res.setEstado(empresa.getEstado());
+        res.setStatus(empresa.getStatus());
+
+        return res;
+    }
 }

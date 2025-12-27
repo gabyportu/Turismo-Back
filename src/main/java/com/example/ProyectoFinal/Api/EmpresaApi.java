@@ -2,12 +2,14 @@ package com.example.ProyectoFinal.Api;
 
 import com.example.ProyectoFinal.Bl.EmpresaBl;
 import com.example.ProyectoFinal.Bl.JwtBl;
+import com.example.ProyectoFinal.Dto.EditarEmpresaRequestDto;
 import com.example.ProyectoFinal.Dto.EmpresaDetalleDto;
 import com.example.ProyectoFinal.Dto.EmpresaDto;
 import com.example.ProyectoFinal.Dto.RegistroEmpresaRequestDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -80,4 +82,30 @@ public class EmpresaApi {
             return ResponseEntity.status(401).body(null);
         }
     }
+    @PutMapping(value = "/editar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> editarEmpresa(
+            @RequestPart("data") String dataJson,
+            @RequestPart(value = "logo", required = false) MultipartFile logo,
+            @RequestHeader(value = "Authorization", required = false) String authHeader
+    ) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(401).body("TOKEN_NO_ENVIADO");
+            }
+
+            String token = authHeader.substring(7).trim();
+            jwtBl.validateTokenAndRoles(token, "ROLE_EMPRESA");
+
+            EditarEmpresaRequestDto req =
+                    objectMapper.readValue(dataJson, EditarEmpresaRequestDto.class);
+
+            EmpresaDto res = empresaBl.editarEmpresa(req, logo);
+            return ResponseEntity.ok(res);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
+    }
+
 }

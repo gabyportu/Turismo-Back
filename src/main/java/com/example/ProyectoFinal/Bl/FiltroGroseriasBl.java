@@ -6,39 +6,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class FiltroGroseriasBl {
     @Autowired
     private PalabraProhibidaRepository palabraProhibidaRepository;
 
-    public boolean contienePalabraProhibida(String palabra) {
-        if(palabra == null || palabra.isBlank()) return false;
+    private static final Set<String> PALABRAS_PROHIBIDAS = Set.of(
+            "mierda", "puta", "carajo", "imbecil", "idiota"
+    );
 
-        String comentario = palabra.toLowerCase();
+    public void validar(String texto) {
+        if (texto == null) return;
 
-        List<PalabraProhibida> palabras = palabraProhibidaRepository.findByStatusTrue();
-        for(PalabraProhibida p : palabras) {
-            if(comentario.contains(p.getPalabra().toLowerCase())){
-                return true;
+        String lower = texto.toLowerCase();
+
+        for (String palabra : PALABRAS_PROHIBIDAS) {
+            if (lower.contains(palabra)) {
+                throw new RuntimeException("El comentario contiene lenguaje inapropiado");
             }
-        }
-        return false;
-    }
-
-    public void validarComentario(String comentario) {
-        if (comentario == null || comentario.isBlank()) {
-            throw new RuntimeException("El comentario no puede estar vacío");
-        }
-
-        String texto = comentario.toLowerCase();
-
-        boolean contiene = palabraProhibidaRepository.findByStatusTrue()
-                .stream()
-                .anyMatch(p -> texto.contains(p.getPalabra().toLowerCase()));
-
-        if (contiene) {
-            throw new RuntimeException("El comentario contiene palabras no permitidas");
         }
     }
 }

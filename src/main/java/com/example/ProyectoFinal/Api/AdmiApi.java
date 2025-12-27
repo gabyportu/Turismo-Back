@@ -140,14 +140,4 @@ public class AdmiApi {
         }
     }
 
-    @PostMapping("/crear/palabra")
-    public ResponseEntity<?> crearPalabra(@RequestBody Map<String, String> body) {
-        palabraProhibidaBl.agregarPalabra(body.get("palabra"));
-        return ResponseEntity.ok("PALABRA AGREGADA");
-    }
-
-    @GetMapping("/listar")
-    public ResponseEntity<?> listar() {
-        return ResponseEntity.ok(palabraProhibidaBl.listar());
-    }
 }

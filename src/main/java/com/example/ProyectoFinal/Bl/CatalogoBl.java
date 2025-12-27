@@ -1,11 +1,13 @@
 package com.example.ProyectoFinal.Bl;
 
 import com.example.ProyectoFinal.Dao.CiudadRepository;
+import com.example.ProyectoFinal.Dao.DepartamentoRepository;
 import com.example.ProyectoFinal.Dao.DestinoRepository;
 import com.example.ProyectoFinal.Dao.TipoActividadRepository;
 import com.example.ProyectoFinal.Dto.DestinoDto;
 import com.example.ProyectoFinal.Dto.ItemDto;
 import com.example.ProyectoFinal.Dto.TipoActividadDto;
+import com.example.ProyectoFinal.Entity.Departamento;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,8 @@ public class CatalogoBl {
     private TipoActividadRepository tipoActividadRepository;
     @Autowired
     private CiudadRepository ciudadRepository;
+    @Autowired
+    private DepartamentoRepository departamentoRepository;
 
     @Transactional(readOnly = true)
     public List<ItemDto> ciudades(){
@@ -38,5 +42,12 @@ public class CatalogoBl {
         return destinoRepository.findAll().stream()
                 .map(d -> new ItemDto(d.getIdDestino(), d.getNombre()))
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ItemDto> departamentos(){
+        List<Departamento> dep = departamentoRepository.findAll();
+        return dep.stream()
+                .map(de -> new ItemDto(de.getIdDepartamento(), de.getNombre())).toList();
     }
 }

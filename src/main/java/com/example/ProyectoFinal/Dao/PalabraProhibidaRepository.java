@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface PalabraProhibidaRepository extends JpaRepository<PalabraProhibida, Integer> {
     List<PalabraProhibida> findByStatusTrue();
+    boolean existsByPalabraIgnoreCase(String palabra);
 }

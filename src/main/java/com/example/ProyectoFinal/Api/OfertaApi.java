@@ -105,21 +105,12 @@ public class OfertaApi {
         }
     }
     @GetMapping("/aprobadas")
-    public ResponseEntity<List<OfertaDto>> listarAprobadas(
-            @RequestHeader(value = "Authorization", required = false) String authHeader
-    ) {
-        try {
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return ResponseEntity.status(401).body(null);
-            }
-            String token = authHeader.substring(7).trim();
-
-            jwtBl.validateTokenAndRoles(token, "ROLE_ADMIN");
-            return ResponseEntity.ok(ofertaBl.listarOfertasAprobadas());
-        }catch (Exception e) {
-            return ResponseEntity.status(401).body(null);
-        }
+    public ResponseEntity<List<OfertaRankingDto>> listarOfertasAprobadas() {
+        return ResponseEntity.ok(
+                ofertaBl.listarOfertasAprobadas()
+        );
     }
+
     @GetMapping("/pendientes")
     public ResponseEntity<List<OfertaDto>> listarPendientes(
             @RequestHeader(value = "Authorization", required = false) String authHeader
@@ -136,12 +127,13 @@ public class OfertaApi {
             return ResponseEntity.status(401).body(null);
         }
     }
-    @GetMapping("mejor-puntuadas")
-    public ResponseEntity<List<OfertaRankingDto>> mejorPuntuadas(){
+    @GetMapping("/mejor-puntuadas")
+    public ResponseEntity<List<OfertaRankingDto>> listarMejorPuntuadas() {
         return ResponseEntity.ok(
-                ofertaBl.obtenerOfertasMejorPuntuadas()
+                ofertaBl.listarOfertasAprobadasMejorPuntuadas()
         );
     }
+
     @GetMapping("/empresa/listado/{idEmpresa}")
     public ResponseEntity<List<OfertaListadoDto>> listadoPorEmpresa(
             @PathVariable Integer idEmpresa,

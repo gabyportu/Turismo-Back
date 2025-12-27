@@ -28,4 +28,8 @@ public class CatalogoApi {
     public ResponseEntity<?> actividades(){
         return ResponseEntity.ok(catalogoBl.tiposActividades());
     }
+    @GetMapping("/departamentos")
+    public ResponseEntity<?> departamentos(){
+        return ResponseEntity.ok(catalogoBl.departamentos());
+    }
 }

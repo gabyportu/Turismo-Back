@@ -13,22 +13,37 @@ public interface OfertaRepository extends JpaRepository<Oferta, Integer>{
     List<Oferta> findByEstadoAndStatus(String estado, Boolean status);
 
     @Query("""
-    SELECT new com.example.ProyectoFinal.Dto.OfertaRankingDto(
-        o.idOferta,
-        o.titulo,
-        o.precio,
-        AVG(r.calificacion),
-        COUNT(r.idResena)
-    )
-    FROM Oferta o
-    JOIN Resena r ON r.oferta.idOferta = o.idOferta
-    WHERE o.estado = 'APROBADO'
-      AND o.status = true
-      AND r.status = true
-    GROUP BY o.idOferta, o.titulo, o.precio
-    ORDER BY AVG(r.calificacion) DESC
-""")
-    List<OfertaRankingDto> listarOfertasMejorPuntuadas();
+        SELECT o.idOferta,
+               o.titulo,
+               o.precio,
+               AVG(r.calificacion),
+               COUNT(r.idResena)
+        FROM Oferta o
+        JOIN Resena r ON r.oferta.idOferta = o.idOferta
+        WHERE o.estado = 'APROBADO'
+          AND o.status = true
+          AND r.status = true
+        GROUP BY o.idOferta, o.titulo, o.precio
+        ORDER BY AVG(r.calificacion) DESC, COUNT(r.idResena) DESC
+    """)
+    List<Object[]> listarOfertasMejorPuntuadas();
+
+    @Query("""
+        SELECT o.idOferta,
+               o.titulo,
+               o.precio,
+               COALESCE(AVG(r.calificacion), 0),
+               COUNT(r.idResena)
+        FROM Oferta o
+        LEFT JOIN Resena r 
+            ON r.oferta.idOferta = o.idOferta
+            AND r.status = true
+        WHERE o.estado = 'APROBADO'
+          AND o.status = true
+        GROUP BY o.idOferta, o.titulo, o.precio
+        ORDER BY o.fechaCreacion DESC
+    """)
+    List<Object[]> listarOfertasAprobadas();
 
     // 🔹 Caso 1: Pendiente + Aprobado
     List<Oferta> findByEmpresa_IdEmpresaAndStatusTrueAndEstadoIn(

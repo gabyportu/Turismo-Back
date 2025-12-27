@@ -117,7 +117,7 @@ public class OfertaBl {
     public OfertaDto editarOferta(OfertaDto ofertaDto,
                                   List<Integer> destinos,
                                   List<Integer> actividades,
-                                  List<MultipartFile> nuevaMultimedia) {
+                                  List<MultipartFile> multimedia) {
 
         try {
             if (ofertaDto.getIdOferta() == null) {
@@ -173,11 +173,24 @@ public class OfertaBl {
                 }
             }
 
-            // ✅ Agregar nueva multimedia (no borra lo anterior)
-            if (nuevaMultimedia != null && !nuevaMultimedia.isEmpty()) {
+            if (multimedia != null && !multimedia.isEmpty()) {
+
+                // 🔴 buscar imágenes actuales
+                List<MultimediaOferta> actuales =
+                        multimediaOfertaRepository.findByOferta_IdOfertaAndStatusTrue(
+                                oferta.getIdOferta()
+                        );
+
+                // 🔴 eliminar de MinIO + BD
+                for (MultimediaOferta mo : actuales) {
+                    minioBl.delete(mo.getMultimedia());
+                    multimediaOfertaRepository.delete(mo);
+                }
+
+                // 🟢 subir nuevas
                 String prefix = "ofertas/" + oferta.getIdOferta() + "/multimedia";
 
-                for (MultipartFile file : nuevaMultimedia) {
+                for (MultipartFile file : multimedia) {
                     if (file == null || file.isEmpty()) continue;
 
                     String objectName = minioBl.upload(file, prefix);
@@ -186,6 +199,7 @@ public class OfertaBl {
                     mo.setOferta(oferta);
                     mo.setMultimedia(objectName);
                     mo.setStatus(true);
+
                     multimediaOfertaRepository.save(mo);
                 }
             }
@@ -294,13 +308,42 @@ public class OfertaBl {
         return detalleDto;
     }
     @Transactional(readOnly = true)
-    public List<OfertaDto> listarOfertasAprobadas() {
+    public List<OfertaRankingDto> listarOfertasAprobadas() {
 
-        return ofertaRepository
-                .findByEstadoAndStatus("APROBADO", true)
-                .stream()
-                .map(this::mapToDto)
-                .toList();
+        List<Object[]> rows = ofertaRepository.listarOfertasAprobadas();
+
+        return rows.stream().map(row -> {
+
+            Integer idOferta = (Integer) row[0];
+            String titulo = (String) row[1];
+            Double precio = (Double) row[2];
+            Double promedio = ((Number) row[3]).doubleValue();
+            Long total = ((Number) row[4]).longValue();
+
+            OfertaRankingDto dto = new OfertaRankingDto();
+            dto.setIdOferta(idOferta);
+            dto.setTitulo(titulo);
+            dto.setPrecio(precio);
+            dto.setPromedio(promedio);
+            dto.setTotalResenas(total);
+
+            // 🖼 Imagen principal
+            multimediaOfertaRepository
+                    .findFirstByOferta_IdOfertaAndStatusTrueOrderByIdMultimediaOfertaAsc(idOferta)
+                    .ifPresent(m -> {
+                        MultimediaItemDto img = new MultimediaItemDto();
+                        img.setIdMultimediaOferta(m.getIdMultimediaOferta());
+                        img.setObjectName(m.getMultimedia());
+                        img.setStatus(m.getStatus());
+                        img.setUrl(
+                                minioBl.presignedGetUrl(m.getMultimedia(), 60)
+                        );
+                        dto.setImagenPrincipal(img);
+                    });
+
+            return dto;
+
+        }).toList();
     }
 
     @Transactional(readOnly = true)
@@ -327,9 +370,40 @@ public class OfertaBl {
         dto.setStatus(oferta.getStatus());
         return dto;
     }
+
     @Transactional(readOnly = true)
-    public List<OfertaRankingDto> obtenerOfertasMejorPuntuadas(){
-        return ofertaRepository.listarOfertasMejorPuntuadas();
+    public List<OfertaRankingDto> listarOfertasAprobadasMejorPuntuadas(){
+        List<Object[]> rows = ofertaRepository.listarOfertasMejorPuntuadas();
+
+        return rows.stream().map(row -> {
+
+            Integer idOferta = (Integer) row[0];
+            String titulo = (String) row[1];
+            Double precio = (Double) row[2];
+            Double promedio = ((Number) row[3]).doubleValue();
+            Long total = ((Number) row[4]).longValue();
+
+            OfertaRankingDto dto = new OfertaRankingDto();
+            dto.setIdOferta(idOferta);
+            dto.setTitulo(titulo);
+            dto.setPrecio(precio);
+            dto.setPromedio(promedio);
+            dto.setTotalResenas(total);
+
+            multimediaOfertaRepository
+                    .findFirstByOferta_IdOfertaAndStatusTrueOrderByIdMultimediaOfertaAsc(idOferta)
+                    .ifPresent(m -> {
+                        MultimediaItemDto img = new MultimediaItemDto();
+                        img.setIdMultimediaOferta(m.getIdMultimediaOferta());
+                        img.setObjectName(m.getMultimedia());
+                        img.setStatus(m.getStatus());
+                        img.setUrl(minioBl.presignedGetUrl(m.getMultimedia(), 60));
+                        dto.setImagenPrincipal(img);
+                    });
+
+            return dto;
+
+        }).toList();
     }
 
     @Transactional(readOnly = true)

@@ -6,15 +6,17 @@ public class OfertaRankingDto {
     private Double precio;
     private Double promedio;
     private Long totalResenas;
+    private MultimediaItemDto imagenPrincipal;
 
     public OfertaRankingDto() {}
 
-    public OfertaRankingDto(Integer idOferta, String titulo, Double precio, Double promedio, Long totalResenas) {
+    public OfertaRankingDto(Integer idOferta, String titulo, Double precio, Double promedio, Long totalResenas, MultimediaItemDto imagenPrincipal) {
         this.idOferta = idOferta;
         this.titulo = titulo;
         this.precio = precio;
         this.promedio = promedio;
         this.totalResenas = totalResenas;
+        this.imagenPrincipal = imagenPrincipal;
     }
 
     public Integer getIdOferta() {
@@ -55,5 +57,13 @@ public class OfertaRankingDto {
 
     public void setTotalResenas(Long totalResenas) {
         this.totalResenas = totalResenas;
+    }
+
+    public MultimediaItemDto getImagenPrincipal() {
+        return imagenPrincipal;
+    }
+
+    public void setImagenPrincipal(MultimediaItemDto imagenPrincipal) {
+        this.imagenPrincipal = imagenPrincipal;
     }
 }
