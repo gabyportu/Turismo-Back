@@ -5,79 +5,78 @@ import java.sql.Timestamp;
 public class ConversacionDto {
     private Integer idConversacion;
     private Integer idTurista;
+    private String nombreTurista;// opcional
+    private String apellidosTurista;
     private Integer idEmpresa;
+    private String nombreEmpresa;  // opcional
     private String mensaje;
     private Timestamp fechaEnvio;
-    private Boolean status;
+    private String rolEmisor; // "TURISTA" o "EMPRESA"
+    private Integer idEmisor;
 
-    public ConversacionDto() {}
+    private Boolean esMio;
 
-    public ConversacionDto(Integer idConversacion, Integer idTurista, Integer idEmpresa, String mensaje, Timestamp fechaEnvio, Boolean status) {
-        this.idConversacion = idConversacion;
-        this.idTurista = idTurista;
-        this.idEmpresa = idEmpresa;
-        this.mensaje = mensaje;
-        this.fechaEnvio = fechaEnvio;
-        this.status = status;
+    // opcional (recomendado para UI)
+    private String emisorNombre;
+
+    public Integer getIdConversacion() { return idConversacion; }
+    public void setIdConversacion(Integer idConversacion) { this.idConversacion = idConversacion; }
+
+    public Integer getIdTurista() { return idTurista; }
+    public void setIdTurista(Integer idTurista) { this.idTurista = idTurista; }
+
+    public String getNombreTurista() { return nombreTurista; }
+    public void setNombreTurista(String nombreTurista) { this.nombreTurista = nombreTurista; }
+
+    public Integer getIdEmpresa() { return idEmpresa; }
+    public void setIdEmpresa(Integer idEmpresa) { this.idEmpresa = idEmpresa; }
+
+    public String getNombreEmpresa() { return nombreEmpresa; }
+    public void setNombreEmpresa(String nombreEmpresa) { this.nombreEmpresa = nombreEmpresa; }
+
+    public String getMensaje() { return mensaje; }
+    public void setMensaje(String mensaje) { this.mensaje = mensaje; }
+
+    public Timestamp getFechaEnvio() { return fechaEnvio; }
+    public void setFechaEnvio(Timestamp fechaEnvio) { this.fechaEnvio = fechaEnvio; }
+
+    public String getRolEmisor() {
+        return rolEmisor;
     }
 
-    public Integer getIdConversacion() {
-        return idConversacion;
+    public void setRolEmisor(String rolEmisor) {
+        this.rolEmisor = rolEmisor;
     }
 
-    public void setIdConversacion(Integer idConversacion) {
-        this.idConversacion = idConversacion;
+    public Integer getIdEmisor() {
+        return idEmisor;
     }
 
-    public Integer getIdTurista() {
-        return idTurista;
+    public void setIdEmisor(Integer idEmisor) {
+        this.idEmisor = idEmisor;
     }
 
-    public void setIdTurista(Integer idTurista) {
-        this.idTurista = idTurista;
+    public Boolean getEsMio() {
+        return esMio;
     }
 
-    public Integer getIdEmpresa() {
-        return idEmpresa;
+    public void setEsMio(Boolean esMio) {
+        this.esMio = esMio;
     }
 
-    public void setIdEmpresa(Integer idEmpresa) {
-        this.idEmpresa = idEmpresa;
+    public String getEmisorNombre() {
+        return emisorNombre;
     }
 
-    public String getMensaje() {
-        return mensaje;
+    public void setEmisorNombre(String emisorNombre) {
+        this.emisorNombre = emisorNombre;
     }
 
-    public void setMensaje(String mensaje) {
-        this.mensaje = mensaje;
+    public String getApellidosTurista() {
+        return apellidosTurista;
     }
 
-    public Timestamp getFechaEnvio() {
-        return fechaEnvio;
-    }
-
-    public void setFechaEnvio(Timestamp fechaEnvio) {
-        this.fechaEnvio = fechaEnvio;
-    }
-
-    public Boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(Boolean status) {
-        this.status = status;
-    }
-
-    @Override
-    public String toString() {
-        return "ConversacionDto{" +
-                "idConversacion=" + idConversacion +
-                ", idTurista=" + idTurista +
-                ", idEmpresa=" + idEmpresa +
-                ", mensaje='" + mensaje + '\'' +
-                ", fechaEnvio=" + fechaEnvio +
-                ", status=" + status +
-                '}';
+    public void setApellidosTurista(String apellidosTurista) {
+        this.apellidosTurista = apellidosTurista;
     }
 }

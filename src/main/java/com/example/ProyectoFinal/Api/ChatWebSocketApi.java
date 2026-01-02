@@ -2,11 +2,16 @@ package com.example.ProyectoFinal.Api;
 
 import com.example.ProyectoFinal.Bl.ConversacionBl;
 import com.example.ProyectoFinal.Dto.ChatMessageDto;
+import com.example.ProyectoFinal.Dto.ConversacionDto;
 import com.example.ProyectoFinal.Entity.Conversacion;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+
+import java.util.Map;
 
 @Controller
 public class ChatWebSocketApi {
@@ -20,14 +25,15 @@ public class ChatWebSocketApi {
     @MessageMapping("/chat/enviar")
     public void enviarMensaje(ChatMessageDto message) {
 
-        Conversacion saved = conversacionBl.guardarMensaje(message);
+        ConversacionDto saved = conversacionBl.guardarMensajeWs(message);
 
-        // Canal único por turista-empresa
-        String topic = "/topic/chat/"
-                + message.getIdTurista()
-                + "/"
-                + message.getIdEmpresa();
+        // ChatWebSocketApi
+        String topicChat = "/topic/chat/" + saved.getIdTurista() + "/" + saved.getIdEmpresa();
+        messagingTemplate.convertAndSend(topicChat, saved);
 
-        messagingTemplate.convertAndSend(topic, saved);
+        String topicEmpresa = "/topic/empresa/" + saved.getIdEmpresa();
+        messagingTemplate.convertAndSend(topicEmpresa, saved);
+
     }
+
 }

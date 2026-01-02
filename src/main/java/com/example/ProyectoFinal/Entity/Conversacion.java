@@ -31,15 +31,23 @@ public class Conversacion implements Serializable {
     @Column(name = "STATUS", nullable = false)
     private Boolean status;
 
+    @Column(name = "ROL_EMISOR", nullable = false, length = 20)
+    private String rolEmisor;   // "TURISTA" o "EMPRESA"
+
+    @Column(name = "ID_EMISOR", nullable = false)
+    private Integer idEmisor;
+
     public Conversacion() {}
 
-    public Conversacion(Integer idConversacion, Turista turista, Empresa empresa, String mensaje, Timestamp fechaEnvio, Boolean status) {
+    public Conversacion(Integer idConversacion, Turista turista, Empresa empresa, String mensaje, Timestamp fechaEnvio, Boolean status, String rolEmisor, Integer idEmisor) {
         this.idConversacion = idConversacion;
         this.turista = turista;
         this.empresa = empresa;
         this.mensaje = mensaje;
         this.fechaEnvio = fechaEnvio;
         this.status = status;
+        this.rolEmisor = rolEmisor;
+        this.idEmisor = idEmisor;
     }
 
     public Integer getIdConversacion() {
@@ -90,6 +98,22 @@ public class Conversacion implements Serializable {
         this.status = status;
     }
 
+    public String getRolEmisor() {
+        return rolEmisor;
+    }
+
+    public void setRolEmisor(String rolEmisor) {
+        this.rolEmisor = rolEmisor;
+    }
+
+    public Integer getIdEmisor() {
+        return idEmisor;
+    }
+
+    public void setIdEmisor(Integer idEmisor) {
+        this.idEmisor = idEmisor;
+    }
+
     @Override
     public String toString() {
         return "Conversacion{" +
@@ -99,6 +123,8 @@ public class Conversacion implements Serializable {
                 ", mensaje='" + mensaje + '\'' +
                 ", fechaEnvio=" + fechaEnvio +
                 ", status=" + status +
+                ", rolEmisor='" + rolEmisor + '\'' +
+                ", idEmisor=" + idEmisor +
                 '}';
     }
 }

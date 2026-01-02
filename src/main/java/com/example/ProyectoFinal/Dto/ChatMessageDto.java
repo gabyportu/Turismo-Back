@@ -5,7 +5,8 @@ public class ChatMessageDto {
     private Integer idTurista;
     private Integer idEmpresa;
     private String mensaje;
-    private String emisor; // TURISTA | EMPRESA
+    private Integer idEmisor;
+    private String rolEmisor; // "TURISTA" o "EMPRESA"
 
     public Integer getIdTurista() {
         return idTurista;
@@ -31,11 +32,19 @@ public class ChatMessageDto {
         this.mensaje = mensaje;
     }
 
-    public String getEmisor() {
-        return emisor;
+    public String getRolEmisor() {
+        return rolEmisor;
     }
 
-    public void setEmisor(String emisor) {
-        this.emisor = emisor;
+    public void setRolEmisor(String rolEmisor) {
+        this.rolEmisor = rolEmisor;
+    }
+
+    public Integer getIdEmisor() {
+        return idEmisor;
+    }
+
+    public void setIdEmisor(Integer idEmisor) {
+        this.idEmisor = idEmisor;
     }
 }
