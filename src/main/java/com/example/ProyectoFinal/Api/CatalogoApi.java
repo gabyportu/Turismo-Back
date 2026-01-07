@@ -1,12 +1,12 @@
 package com.example.ProyectoFinal.Api;
 
 import com.example.ProyectoFinal.Bl.CatalogoBl;
+import com.example.ProyectoFinal.Dto.CiudadDto;
+import com.example.ProyectoFinal.Dto.DestinoDto;
+import com.example.ProyectoFinal.Dto.TipoActividadDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/catalogos")
@@ -31,5 +31,21 @@ public class CatalogoApi {
     @GetMapping("/departamentos")
     public ResponseEntity<?> departamentos(){
         return ResponseEntity.ok(catalogoBl.departamentos());
+    }
+
+    @PostMapping("/crearCiudades")
+    public ResponseEntity<?> crearCiudad(
+            @RequestBody CiudadDto dto) {
+        return ResponseEntity.ok(catalogoBl.crearCiudad(dto));
+    }
+    @PostMapping("/crearDestinos")
+    public ResponseEntity<?> crearDestino(
+            @RequestBody DestinoDto dto){
+        return ResponseEntity.ok(catalogoBl.crearDestino(dto));
+    }
+    @PostMapping("/crearActividad")
+    public ResponseEntity<?> crearActividad(
+            @RequestBody TipoActividadDto dto){
+        return ResponseEntity.ok(catalogoBl.crearTipoActividad(dto));
     }
 }

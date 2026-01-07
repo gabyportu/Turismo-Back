@@ -136,6 +136,9 @@ public class EmpresaBl {
         empresa.setEstado("APROBADO");
         empresa.setStatus(true);
         empresaRepository.save(empresa);
+
+        emailSenderBl.sendEmail("proyectoturismoportugal@gmail.com", "Empres Aprobada", "Estimado usuario, la empresa que registro se aprob+o exitosamente ya puede ingresar al sistema. ");
+
     }
 
     @Transactional
@@ -145,6 +148,9 @@ public class EmpresaBl {
         empresa.setEstado("RECHAZADO");
         empresa.setStatus(false);
         empresaRepository.save(empresa);
+
+        emailSenderBl.sendEmail("proyectoturismoportugal@gmail.com", "Empres Rechazada", "Estimado usuario, la empresa que registro se rechaz+o ");
+
     }
     @Transactional(readOnly = true)
     public EmpresaDetalleDto obtenerDetalleEmpresa(Integer idEmpresa) {

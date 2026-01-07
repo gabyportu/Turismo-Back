@@ -70,4 +70,27 @@ public class JwtBl {
         }
         throw new AccessDeniedException("ROL_NO_AUTORIZADO" + role);
     }
+
+    public String generatePasswordResetToken(String email) {
+        Instant now = Instant.now();
+        return Jwts.builder()
+                .setSubject(email)
+                .claim("type", "PWD_RESET")
+                .setIssuedAt(Date.from(now))
+                // 15 minutos
+                .setExpiration(Date.from(now.plus(15, ChronoUnit.MINUTES)))
+                .signWith(key(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public Claims parseResetClaims(String token) {
+        Claims claims = parseClaims(token);
+
+        String type = (String) claims.get("type");
+        if (!"PWD_RESET".equals(type)) {
+            throw new RuntimeException("TOKEN_RESET_INVALIDO");
+        }
+        return claims;
+    }
+
 }

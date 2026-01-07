@@ -30,6 +30,8 @@ public class OfertaBl {
     private MultimediaOfertaRepository multimediaOfertaRepository;
     @Autowired
     private MinioBl minioBl;
+    @Autowired
+    private EmailSenderBl emailSenderBl;
 
     @Transactional
     public OfertaDto crearOferta(OfertaDto ofertaDto,
@@ -106,7 +108,11 @@ public class OfertaBl {
             res.setFechaCreacion(oferta.getFechaCreacion());
             res.setStatus(oferta.getStatus());
 
+            emailSenderBl.sendEmail("proyectoturismoportugal@gmail.com", "Oferta en verificación", "Estimado usuario, la oferta que registro se encuentra en estado de verificación. ");
+
+
             return res;
+
         }catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException("Error al crear oferta: " + e.getMessage());
@@ -217,6 +223,8 @@ public class OfertaBl {
             res.setFechaCreacion(oferta.getFechaCreacion());
             res.setStatus(oferta.getStatus());
 
+            emailSenderBl.sendEmail("proyectoturismoportugal@gmail.com", "Oferta en verificación", "Estimado usuario, la oferta que registro se encuentra en estado de verificación. ");
+
             return res;
 
         } catch (Exception e) {
@@ -233,6 +241,9 @@ public class OfertaBl {
         oferta.setEstado("APROBADO");
         oferta.setStatus(true);
         ofertaRepository.save(oferta);
+
+        emailSenderBl.sendEmail("proyectoturismoportugal@gmail.com", "Oferta Aprobada", "Estimado usuario, la oferta que registro fue aprobada exitosamente. ");
+
     }
 
     @Transactional
@@ -242,6 +253,9 @@ public class OfertaBl {
         oferta.setEstado("RECHAZADO");
         oferta.setStatus(false);
         ofertaRepository.save(oferta);
+
+        emailSenderBl.sendEmail("proyectoturismoportugal@gmail.com", "Oferta Rechazada", "Estimado usuario, la oferta que registro fue rechazada. ");
+
     }
 
     @Transactional(readOnly = true)
